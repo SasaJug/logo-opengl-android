@@ -6,6 +6,8 @@ import android.opengl.Matrix;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.sasaj.logoopengles.objects.CharacterK;
+import com.sasaj.logoopengles.objects.CharacterO;
 import com.sasaj.logoopengles.objects.Ring;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -27,12 +29,17 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     private final float z = 0.0f;
 
     private Ring ring;
+    private CharacterO charO;
+    private CharacterK charK;
 
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
         // Set the background frame color to black
         GLES32.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
         ring = new Ring();
+        charO = new CharacterO();
+        charK = new CharacterK();
         // Set the camera position (View matrix)
         Matrix.setLookAtM(mViewMatrix, 0,
                 0.0f, 0f, 50.0f,//camera is at (0,0,1)
@@ -65,6 +72,20 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         Matrix.multiplyMM(mMVMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVMatrix, 0);
         ring.draw(mMVPMatrix);
+
+        setIdentitiyMatrices();
+        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, x, y, z);
+        Matrix.translateM(mModelMatrix, 0, -5.0f, 0.0f, zDim);
+        Matrix.multiplyMM(mMVMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVMatrix, 0);
+        charO.draw(mMVPMatrix);
+
+        setIdentitiyMatrices();
+        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, x, y, z);
+        Matrix.translateM(mModelMatrix, 0, 5.0f, 0.0f, zDim);
+        Matrix.multiplyMM(mMVMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVMatrix, 0);
+        charK.draw(mMVPMatrix);
     }
 
     private void setIdentitiyMatrices() {
