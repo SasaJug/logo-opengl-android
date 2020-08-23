@@ -3,7 +3,10 @@ package com.sasaj.logoopengles;
 import android.opengl.GLES32;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.os.SystemClock;
 import android.util.Log;
+
+import com.sasaj.logoopengles.objects.Ring;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -23,11 +26,13 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     private final float y = 1.0f;
     private final float z = 0.0f;
 
+    private Ring ring;
+
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
         // Set the background frame color to black
         GLES32.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
+        ring = new Ring();
         // Set the camera position (View matrix)
         Matrix.setLookAtM(mViewMatrix, 0,
                 0.0f, 0f, 50.0f,//camera is at (0,0,1)
@@ -47,6 +52,25 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 gl10) {
 
+        long time = SystemClock.uptimeMillis() % 10000L;
+        float angleInDegrees = (360.0f / 10000.0f) * ((int) time);
+
+        GLES32.glClear(GLES32.GL_COLOR_BUFFER_BIT | GLES32.GL_DEPTH_BUFFER_BIT);// Draw background color
+        GLES32.glClearDepthf(1.0f);//set up the depth buffer
+        GLES32.glEnable(GLES32.GL_DEPTH_TEST);//enable depth test (so, it will not look through the surfaces)
+        GLES32.glDepthFunc(GLES32.GL_LEQUAL);//indicate what type of depth test
+
+        setIdentitiyMatrices();
+        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, x, y, z);
+        Matrix.multiplyMM(mMVMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVMatrix, 0);
+        ring.draw(mMVPMatrix);
+    }
+
+    private void setIdentitiyMatrices() {
+        Matrix.setIdentityM(mMVPMatrix, 0);//set the model view projection matrix to an identity matrix
+        Matrix.setIdentityM(mMVMatrix, 0);//set the model view  matrix to an identity matrix
+        Matrix.setIdentityM(mModelMatrix, 0);//set the model matrix to an identity matrix
     }
 
     public static void checkGlError(String glOperation) {
