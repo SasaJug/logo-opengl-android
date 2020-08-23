@@ -10,6 +10,7 @@ import com.sasaj.logoopengles.objects.CharacterK;
 import com.sasaj.logoopengles.objects.CharacterO;
 import com.sasaj.logoopengles.objects.Ring;
 
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
